@@ -9,7 +9,6 @@ typedef struct {
     int n;
     int s;
     int t;
-    int v;
 } MyObject;
 
 void infinity_input(MyObject *obj);
@@ -20,7 +19,7 @@ void flag_b(const int cheker, int *line);
 int is_string_empty(int i, char *buffer);
 
 int main(int argc, char *argv[]) {
-    MyObject obj = {0, 0, 0, 0, 0, 0};
+    MyObject obj = {0, 0, 0, 0, 0};
 
     // Проверяем, что переданы аргументы командной строки
     if (argc < 2) {
@@ -160,7 +159,6 @@ int check_flag(char *c, MyObject *obj, FILE *tmp) {
         }
         if (strcmp(c, "-e") == 0) {
             obj->e = 1;
-            obj->v = 1;
             return 1;
         }
         if (strcmp(c, "-n") == 0) {
@@ -173,7 +171,6 @@ int check_flag(char *c, MyObject *obj, FILE *tmp) {
         }
         if (strcmp(c, "-t") == 0) {
             obj->t = 1;
-            obj->v = 1;
             return 1;
         }
         printf("cat: invalid option - '%s'\n", c);
@@ -206,7 +203,7 @@ void infinity_input(MyObject *obj) {
             flag_s = 0;
 
         if (obj->n == 1) {
-            printf("    %d  ", line);
+            printf("%6d\t", line);
             line++;
         };
         if (obj->b == 1) flag_b(empty_string_checker, &line);
