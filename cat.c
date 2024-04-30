@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+// #include <unistd.h>
+#include <getopt.h>
 
 typedef struct {
     int b;
@@ -116,9 +117,15 @@ int is_string_empty(int i, char *buffer) {
     return 0;
 }
 void check_opt(MyObject *obj, int argc, char *argv[]) {
-    int option;
+    static struct option options[] = {
+        {"number-nonblank", no_argument, 0, 'b'},
+        {"number", no_argument, 0, 'n'},
+        {"squeeze-blank", no_argument, 0, 's'},
+        {0, 0, 0, 0},
+    };
 
-    while ((option = getopt(argc, argv, "benst")) != -1) {
+    int option;
+    while ((option = getopt_long(argc, argv, "benstET", options, NULL)) != EOF) {
         switch (option) {
             case 'b':
                 obj->b = 1;
@@ -130,10 +137,16 @@ void check_opt(MyObject *obj, int argc, char *argv[]) {
             case 'e':
                 obj->e = 1;
                 break;
+            case 'E':
+                obj->e = 1;
+                break;
             case 's':
                 obj->s = 1;
                 break;
             case 't':
+                obj->t = 1;
+                break;
+            case 'T':
                 obj->t = 1;
                 break;
             case '?':
@@ -178,9 +191,7 @@ void infinity_input(MyObject *obj) {
     char input[4096];
     int line = 1;
     int flag_s = 0;
-    while (1) {
-        fgets(input, sizeof(input), stdin);
-
+    while (fgets(input, sizeof(input), stdin) != NULL) {
         int empty_string_checker = is_string_empty(0, input);
 
         if (obj->s == 1 && empty_string_checker && flag_s > 0)
