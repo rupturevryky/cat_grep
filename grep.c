@@ -19,13 +19,19 @@ typedef struct {
 
 void check_opt(MyObject *obj, int argc, char *argv[]);
 
+void infinity_input();
+
 int main(int argc, char *argv[]) {
     MyObject obj = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     check_opt(&obj, argc, argv);
 
     // Проверяем, что переданы аргументы командной строки
-    if (optind >= argc) printf("Usage: grep [OPTION]... PATTERNS [FILE]...");
+    if (optind >= argc) {
+        printf("Usage: grep [OPTION]... PATTERNS [FILE]...");
+        return 0;
+    }
+    infinity_input(&obj);
 
     return 0;
 }
@@ -70,5 +76,12 @@ void check_opt(MyObject *obj, int argc, char *argv[]) {
             default:
                 abort();
         }
+    }
+}
+
+void infinity_input() {
+    char input[8192];
+    while (fgets(input, sizeof(input), stdin) != NULL) {
+        printf("\x1b[31m%s\x1b[0m", input);
     }
 }
