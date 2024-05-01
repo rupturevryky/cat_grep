@@ -19,7 +19,7 @@ typedef struct {
 
 void check_opt(MyObject *obj, int argc, char *argv[]);
 
-void infinity_input(char *pattern);
+void infinity_input(char *pattern, MyObject *obj);
 
 int main(int argc, char *argv[]) {
     MyObject obj = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -33,8 +33,20 @@ int main(int argc, char *argv[]) {
     }
     char *pattern = argv[optind];
 
-    if (optind + 1 == argc) infinity_input(pattern);
+    if (optind + 1 == argc) infinity_input(pattern, &obj);
 
+    optind++;
+
+    FILE *file = NULL;
+    while (optind < argc) {
+        char *filename = argv[optind];
+        file = fopen(filename, "r");
+
+        if (file == NULL) {
+            printf("grep: %s: No such file or directory", filename);
+        };
+        optind++;
+    }
     return 0;
 }
 
@@ -80,21 +92,54 @@ void check_opt(MyObject *obj, int argc, char *argv[]) {
         }
     }
 }
+void flag_n(int line, MyObject *obj, char prev_char, int i,
+            int should) {  // should - принуждение для срабатывания, например с флагом o
+    if (obj->n == 1 && (should || i == 0 || prev_char == '\n')) {
+        if (isatty(fileno(stdout)))
+            printf("\033[0;32m%d\033[0m\033[0;36m:\033[0m", line);
+        else
+            printf("%c:", line);
+    }
+}
+
+void flag_o(int line, MyObject *obj, char prev_char, int i, int updateble) {
+    if (obj->o == 1 && updateble) {  // флаг o
+        printf("\n");
+        flag_n(line, obj, prev_char, i, 1);
+    }
+}
 
 char *next_found(char *input, char *pattern, int *pattern_index, char *found, int *pattern_end,
-                 int *updateble, int pattern_len) {
+                 int *updateble, int pattern_len, int line, MyObject *obj, int i) {
     int tmp = *pattern_index;
     found = strstr(found + 1, pattern);
     *pattern_index = found - input;
-    if (tmp == *pattern_index) {
+    if (tmp == *pattern_index || found == NULL) {
         *updateble = 0;
         return found;
     }
     *pattern_end = *pattern_index + pattern_len - 1;
+    flag_o(line, obj, input[i - 1] || '\0', i, *updateble);
     return found;
 }
+char *print_char_in_infinuty(int *pattern_index, int *pattern_end, int *updateble, char *input, char *found,
+                             char *pattern, int pattern_len, int i, MyObject *obj, int line) {
+    if (*updateble && i > *pattern_end && found != NULL) {
+        found = next_found(input, pattern, pattern_index, found, pattern_end, updateble, pattern_len, line,
+                           obj, i);
+    }
+    if (i >= *pattern_index && i <= *pattern_end) {
+        if (isatty(fileno(stdout)))
+            printf("\x1b[31m%c\x1b[0m", input[i]);
+        else
+            printf("%c", input[i]);
+    } else if (obj->o == 0)
+        printf("%c", input[i]);
 
-void colorize_line(char *input, char *pattern, int pattern_len) {
+    return found;
+};
+
+void check_line_for_pattern(char *input, char *pattern, int pattern_len, int line, MyObject *obj) {
     char *found = strstr(input, pattern);
 
     if (found != NULL) {
@@ -103,26 +148,22 @@ void colorize_line(char *input, char *pattern, int pattern_len) {
         int pattern_end = pattern_index + pattern_len - 1;
 
         for (int i = 0; input[i] != '\0'; i++) {
-            if (i >= pattern_index && i <= pattern_end)
-                printf("\x1b[31m%c\x1b[0m", input[i]);
-            else if (updateble && i > pattern_end && found != NULL) {
-                found =
-                    next_found(input, pattern, &pattern_index, found, &pattern_end, &updateble, pattern_len);
-                i--;
-                continue;
-            } else
-                printf("%c", input[i]);
+            flag_n(line, obj, input[i - 1] || '\0', i, 0);
+            found = print_char_in_infinuty(&pattern_index, &pattern_end, &updateble, input, found, pattern,
+                                           pattern_len, i, obj, line);
         }
         printf("\n");
     }
 }
 
-void infinity_input(char *pattern) {
+void infinity_input(char *pattern, MyObject *obj) {  // ему безразличен флаг h
+    int line = 0;
     char input[8192];
     int pattern_len = strlen(pattern);
     while (fgets(input, sizeof(input), stdin) != NULL) {
+        line++;
         input[strcspn(input, "\n")] = '\0';  // Удаляем символ новой строки
 
-        colorize_line(input, pattern, pattern_len);
+        check_line_for_pattern(input, pattern, pattern_len, line, obj);
     }
 }
