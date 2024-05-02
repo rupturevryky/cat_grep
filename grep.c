@@ -1,4 +1,4 @@
-#include <ctype.h>
+// #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,23 +17,24 @@ typedef struct {
     int o;
 } MyObject;
 
-void check_opt(MyObject *obj, int argc, char *argv[]);
+void check_opt(MyObject *obj, int argc, char *argv[], FILE *reg_ex_file, char *pattern);
 
 void infinity_input(char *pattern, MyObject *obj);
 
 int main(int argc, char *argv[]) {
     MyObject obj = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-    check_opt(&obj, argc, argv);
+    FILE *reg_ex_file = NULL;
+    char *pattern = malloc(sizeof(char) * 128);
+    check_opt(&obj, argc, argv, reg_ex_file, pattern);
 
     // Проверяем, что передан патерн
-    if (optind == argc) {
+    if (optind == argc && obj.f == 0) {
         printf("Usage: grep [OPTION]... PATTERNS [FILE]...");
         return 0;
     }
-    char *pattern = argv[optind];
+    if (obj.f == 0) pattern = argv[optind];
 
-    if (optind + 1 == argc) infinity_input(pattern, &obj);
+    if ((optind + 1 == argc && obj.f == 0) || (optind == argc && obj.f == 1)) infinity_input(pattern, &obj);
 
     optind++;
 
@@ -50,10 +51,28 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void check_opt(MyObject *obj, int argc, char *argv[]) {
-    int option;
+void flag_f(MyObject *obj, FILE *reg_ex_file, char *pattern) {
+    obj->f = 1;
+    reg_ex_file = fopen(optarg, "r");
 
-    while ((option = getopt(argc, argv, "eivclnhsfo")) != -1) {
+    long file_size;
+    // Определяем размер файла
+    fseek(reg_ex_file, 0, SEEK_END);
+    file_size = ftell(reg_ex_file);
+    rewind(reg_ex_file);
+
+    // Выделяем память для буфера
+    pattern = (char *)realloc(pattern, file_size * sizeof(char));
+    // Читаем содержимое файла в буфер
+    fread(pattern, sizeof(char), file_size, reg_ex_file);
+
+    // Закрываем файл
+    fclose(reg_ex_file);
+};
+
+void check_opt(MyObject *obj, int argc, char *argv[], FILE *reg_ex_file, char *pattern) {
+    int option;
+    while ((option = getopt(argc, argv, "eivclnhsof:")) != -1) {
         switch (option) {
             case 'e':
                 obj->e = 1;
@@ -80,7 +99,7 @@ void check_opt(MyObject *obj, int argc, char *argv[]) {
                 obj->s = 1;
                 break;
             case 'f':
-                obj->f = 1;
+                flag_f(obj, reg_ex_file, pattern);
                 break;
             case 'o':
                 obj->o = 1;
@@ -158,7 +177,7 @@ void check_line_for_pattern(char *input, char *pattern, int pattern_len, int lin
     }
 }
 
-void infinity_input(char *pattern, MyObject *obj) {  // ему безразличен флаг h
+void infinity_input(char *pattern, MyObject *obj) {  // ему безразличны флаги h, s
     int line = 0;
     char input[8192];
     int pattern_len = strlen(pattern);
