@@ -103,7 +103,7 @@ void flag_n(int line, MyObject *obj, char prev_char, int i,
 }
 
 void flag_o(int line, MyObject *obj, char prev_char, int i, int updateble) {
-    if (obj->o == 1 && updateble) {  // флаг o
+    if (obj->o == 1 && updateble) {
         printf("\n");
         flag_n(line, obj, prev_char, i, 1);
     }
@@ -129,9 +129,11 @@ char *print_char_in_infinuty(int *pattern_index, int *pattern_end, int *updatebl
                            obj, i);
     }
     if (i >= *pattern_index && i <= *pattern_end) {
-        if (isatty(fileno(stdout)))
-            printf("\x1b[31m%c\x1b[0m", input[i]);
-        else
+        if (isatty(fileno(stdout))) {
+            if (i == *pattern_index) printf("\033[1;31m");
+            printf("%c", input[i]);
+            if (i == *pattern_end) printf("\033[0m");
+        } else
             printf("%c", input[i]);
     } else if (obj->o == 0)
         printf("%c", input[i]);
