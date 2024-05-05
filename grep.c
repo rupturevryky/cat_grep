@@ -1,4 +1,5 @@
-// #include <ctype.h>
+#include <ctype.h>
+// #include <math.h>
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -194,14 +195,23 @@ int check_opt(MyObject *obj, int argc, char *argv[], FILE *reg_ex_file, char *pa
     return 0;
 }
 
-// void take_true_end(char *input, int *pattern_end) {
-//     // printf("\npattern_end before: %d\n", *pattern_end);
-//     if (!isalpha(input[*pattern_end])) {
-//         //  !isalpha(input[*pattern_end + 1] && !isalpha(input[*pattern_end + 2]))))
-//         *pattern_end += 1;
-//         *pattern_end -= 1;
-//     }
-// }
+void take_true_end(char *input, int *pattern_end, regmatch_t match) {
+    int i = match.rm_so;
+    int count_ru = 0;
+    while (i < match.rm_eo) {
+        if (!isalpha(input[i]) && !isdigit(input[i])) count_ru++;
+        i++;
+    }
+    if (count_ru % 2 == 0)
+        count_ru = 0;
+    else
+        count_ru = 1;
+    if (!isalpha(input[*pattern_end - 1]) && !isdigit(input[*pattern_end - 1]) &&
+        (!isalpha(input[*pattern_end]) || !isdigit(input[*pattern_end])) &&
+        (!isalpha(input[*pattern_end + 1]) || !isdigit(input[*pattern_end + 1]))) {
+        *pattern_end += count_ru;
+    }
+}
 
 void next_found(char *input, regex_t *regex, int *pattern_index, int *reti, int *pattern_end, int *updateble,
                 regmatch_t match, int line, MyObject *obj, int i) {
@@ -213,8 +223,7 @@ void next_found(char *input, regex_t *regex, int *pattern_index, int *reti, int 
         *updateble = 0;
     } else {
         *pattern_end = match.rm_eo + i;
-        // take_true_end(input, pattern_end, *pattern_index);
-        // take_true_end(input, pattern_end);
+        take_true_end(input, pattern_end, match);
     }
 
     flag_o(line, obj, input[i - 1] || '\0', i, *updateble);
@@ -247,7 +256,7 @@ void check_line_for_pattern(char *input, regex_t *regex, int line, MyObject *obj
         int updateble = 1;
         int pattern_index = match.rm_so;
         int pattern_end = match.rm_eo;
-        // take_true_end(input, &pattern_end);
+        take_true_end(input, &pattern_end, match);
 
         for (int i = 0; input[i] != '\0'; i++) {
             flag_n(line, obj, input[i - 1] || '\0', i, 0);
