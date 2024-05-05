@@ -1,4 +1,4 @@
-#include <ctype.h>
+// #include <ctype.h>
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,13 +46,13 @@ int main(int argc, char *argv[]) {
 
     regex_t regex;
     if (obj.i == 1)
-        regcomp(&regex, pattern, REG_EXTENDED | REG_ICASE);
+        regcomp(&regex, pattern, REG_ICASE);
     else
         regcomp(&regex, pattern, REG_EXTENDED);
 
     if ((optind + 1 == argc && obj.f == 0) || (optind == argc && obj.f == 1)) {
         infinity_input(&regex, &obj);
-
+        regfree(&regex);
         // if (pattern) free(pattern);
         return 0;
     }
