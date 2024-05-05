@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 
     if (obj.f == 0) pattern = argv[optind];
 
-    flag_i(&obj, pattern);
+    // flag_i(&obj, pattern);
 
     regex_t regex;
     if (obj.i == 1)
@@ -71,15 +71,15 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void flag_i(MyObject *obj, char *str) {
-    if (obj->i == 1) {
-        int i = 0;
-        while (str[i]) {
-            str[i] = tolower(str[i]);
-            i++;
-        }
-    }
-}
+// void flag_i(MyObject *obj, char *str) {
+//     if (obj->i == 1) {
+//         int i = 0;
+//         while (str[i]) {
+//             str[i] = tolower(str[i]);
+//             i++;
+//         }
+//     }
+// }
 
 int flag_f(MyObject *obj, FILE *reg_ex_file, char *pattern) {
     obj->f = 1;
@@ -206,13 +206,13 @@ int check_opt(MyObject *obj, int argc, char *argv[], FILE *reg_ex_file, char *pa
 void next_found(char *input, regex_t *regex, int *pattern_index, int *reti, int *pattern_end, int *updateble,
                 regmatch_t match, int line, MyObject *obj, int i) {
     int tmp = *pattern_index;
-    *reti = regexec(regex, input + i - 1, 1, &match, 0);
-    *pattern_index = match.rm_so + i - 1;
+    *reti = regexec(regex, input + i, 1, &match, 0);
+    *pattern_index = match.rm_so + i;
 
-    if (tmp == *pattern_index || *reti)
+    if (tmp == *pattern_index || *reti) {
         *updateble = 0;
-    else {
-        *pattern_end = match.rm_eo + i - 1;
+    } else {
+        *pattern_end = match.rm_eo + i;
         // take_true_end(input, pattern_end, *pattern_index);
         // take_true_end(input, pattern_end);
     }
@@ -222,7 +222,7 @@ void next_found(char *input, regex_t *regex, int *pattern_index, int *reti, int 
 
 void print_char_in_infinuty(int *pattern_index, int *pattern_end, int *updateble, char *input, int *reti,
                             regex_t *regex, int i, MyObject *obj, int line, regmatch_t match) {
-    if (*updateble && i > *pattern_end) {
+    if (*updateble && i >= *pattern_end) {
         next_found(input, regex, pattern_index, reti, pattern_end, updateble, match, line, obj, i);
     }
     if (i >= *pattern_index && i < *pattern_end) {
@@ -266,7 +266,7 @@ void infinity_input(regex_t *regex, MyObject *obj) {  // ему безразли
     int line_c = 0;
     char input[8192];
     while (fgets(input, sizeof(input), stdin) != NULL) {
-        flag_i(obj, input);
+        // flag_i(obj, input);
         line++;
         input[strcspn(input, "\n")] = '\0';  // Удаляем символ новой строки
 
