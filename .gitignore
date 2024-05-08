@@ -1,4 +1,4 @@
-*.txt
-t*
-cat
-grep
+*txt*
+tmp*
+pat
+s21*
