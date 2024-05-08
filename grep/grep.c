@@ -52,21 +52,40 @@ int main(int argc, char *argv[]) {
     if ((optind + 1 == argc && obj.f == 0) || (optind == argc && obj.f == 1)) {
         infinity_input(&regex, &obj);
         regfree(&regex);
-        if (pattern) free(pattern);
+        // if (pattern) free(pattern);
         return 0;
     }
     optind++;
 
-    FILE *file = NULL;
-    while (optind < argc) {
-        char *filename = argv[optind];
-        file = fopen(filename, "r");
+    FILE *now_file = NULL;
+    for (int i = optind; i < argc; i++) {
+        char *filename = argv[i];
+        now_file = fopen(filename, "r");
 
-        if (file == NULL) {
+        if (now_file == NULL) {
             printf("grep: %s: No such file or directory", filename);
+            continue;
         };
-        optind++;
+        // Определение размера файла
+        fseek(now_file, 0, SEEK_END);
+        long fileSize = ftell(now_file);
+        fseek(now_file, 0, SEEK_SET);
+        // Создаём массим buffer и копируем в него текущий файл
+        char *buffer = (char *)malloc(fileSize);
+        if (buffer == NULL) {
+            fclose(now_file);
+            continue;
+        }
+        fread(buffer, fileSize, 1, now_file);
+        buffer[fileSize] = '\0';
+
+        free(buffer);
+        if (now_file) fclose(now_file);
     }
+
+    regfree(&regex);
+    // if (pattern) free(pattern);
+
     return 0;
 }
 
