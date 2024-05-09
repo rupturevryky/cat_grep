@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # без флагов
-cat ./txt/1.txt ./txt/2.txt ./txt/3.txt > test_cat1.txt
-../cat/s21_cat ./txt/1.txt ./txt/2.txt ./txt/3.txt > test_cat2.txt
+cat ./txt/*.txt > test_cat1.txt
+../cat/s21_cat ./txt/*.txt > test_cat2.txt
 diff test_cat1.txt test_cat2.txt
 rm -rf test_cat1.txt test_cat2.txt
 

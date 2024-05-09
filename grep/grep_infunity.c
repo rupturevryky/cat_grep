@@ -82,15 +82,17 @@ void print_char_in_infinuty(int *pattern_index, int *pattern_end, int *updateble
         printf("%c", input[i]);
 };
 
-void check_line_for_pattern(char *input, regex_t *regex, int line, MyObject *obj, int *line_c,
-                            const char *file_name, int is_other_files) {
+int check_line_for_pattern(char *input, regex_t *regex, int line, MyObject *obj, int *line_c,
+                           const char *file_name, int is_other_files) {
     regmatch_t match;
     int reti = regexec(regex, input, 1, &match, 0);
 
     flag_v(obj, &reti);
 
     if (!reti) {
-        if (flag_c(obj, line_c, 0, file_name, is_other_files) == 0) return;
+        if (flag_l(obj, file_name) == 0) return 1;
+
+        if (flag_c(obj, line_c, 0, file_name, is_other_files) == 0) return 0;
         int updateble = 1;
         int pattern_index = match.rm_so;
         int pattern_end = match.rm_eo - 1;
@@ -100,7 +102,7 @@ void check_line_for_pattern(char *input, regex_t *regex, int line, MyObject *obj
         int now_pattern_end = pattern_end;
 
         for (int i = 0; input[i] != '\0'; i++) {
-            print_now_file(file_name, input[i - 1] || '\0', i, obj, is_other_files);
+            print_now_file(file_name, input[i - 1] || '\0', i, obj, is_other_files, 0);
             flag_n(line, obj, input[i - 1] || '\0', i, 0);
             print_char_in_infinuty(&pattern_index, &pattern_end, &updateble, input, &reti, regex, i, obj,
                                    line, match, &now_pattern_start, &now_pattern_end, file_name,
@@ -108,27 +110,32 @@ void check_line_for_pattern(char *input, regex_t *regex, int line, MyObject *obj
         }
         printf("\n");
     }
+    return 0;
 }
 
-void while_decompose(int *line, char *input, regex_t *regex, MyObject *obj, const char *file_name,
-                     int *line_c, int is_other_files) {
+int while_decompose(int *line, char *input, regex_t *regex, MyObject *obj, const char *file_name, int *line_c,
+                    int is_other_files) {
     *line += 1;
     input[strcspn(input, "\n")] = '\0';  // Удаляем символ новой строки
 
-    check_line_for_pattern(input, regex, *line, obj, line_c, file_name, is_other_files);
+    return check_line_for_pattern(input, regex, *line, obj, line_c, file_name, is_other_files);
 }
 
 void infinity_input(regex_t *regex, MyObject *obj, const int sizeof_string, FILE *now_file,
                     const char *file_name, int is_other_files) {
-    if (flag_l(obj) == 0) return;
+    if (!file_name && flag_l(obj, file_name) == 0) return;
 
     int line = 0;
     int line_c = 0;
     char input[sizeof_string];
 
+    int flag_file_l = 0;
+
     if (now_file != NULL)
-        while (fgets(input, sizeof(input), now_file) != NULL)
-            while_decompose(&line, input, regex, obj, file_name, &line_c, is_other_files);
+        while (fgets(input, sizeof(input), now_file) != NULL) {
+            flag_file_l = while_decompose(&line, input, regex, obj, file_name, &line_c, is_other_files);
+            if (flag_file_l) return;
+        }
 
     else
         while (fgets(input, sizeof(input), stdin) != NULL)

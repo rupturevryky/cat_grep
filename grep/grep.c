@@ -26,7 +26,7 @@ int check_opt(MyObject *obj, int argc, char *argv[], FILE *reg_ex_file, char *pa
 int main(int argc, char *argv[]) {
     MyObject obj = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     FILE *reg_ex_file = NULL;
-    char *pattern = malloc(sizeof(char) * 128);
+    char *pattern = (char *)malloc(128 * sizeof(char));
 
     if (check_opt(&obj, argc, argv, reg_ex_file, pattern) != 0) {
         free(pattern);
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    if (obj.f == 0) pattern = argv[optind];
+    if (obj.f == 0) strcpy(pattern, argv[optind]);
 
     regex_t regex;
     if (obj.i == 1)
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     if ((optind + 1 == argc && obj.f == 0) || (optind == argc && obj.f == 1)) {
         infinity_input(&regex, &obj, 8192, NULL, NULL, 0);
         regfree(&regex);
-        // if (pattern) free(pattern);
+        if (pattern) free(pattern);
         return 0;
     }
     optind++;
