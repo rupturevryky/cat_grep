@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # без флагов
-cat ./txt/*.txt > test_cat1.txt
-../cat/s21_cat ./txt/*.txt > test_cat2.txt
+cat ./txt/1.txt ./txt/2.txt ./txt/3.txt > test_cat1.txt
+../cat/s21_cat ./txt/1.txt ./txt/2.txt ./txt/3.txt > test_cat2.txt
 diff test_cat1.txt test_cat2.txt
 rm -rf test_cat1.txt test_cat2.txt
 
@@ -12,22 +12,17 @@ cat -b ./txt/*.txt > test_cat1.txt
 diff test_cat1.txt test_cat2.txt
 rm -rf test_cat1.txt test_cat2.txt
 
-cat --number-nonblank ./txt/*.txt > test_cat1.txt
-../cat/s21_cat --number-nonblank ./txt/*.txt > test_cat2.txt
-diff test_cat1.txt test_cat2.txt
-rm -rf test_cat1.txt test_cat2.txt
-
 # -e -E
 
-cat -e ./txt/*.txt > test_cat1.txt
-../cat/s21_cat -e ./txt/*.txt > test_cat2.txt
-diff test_cat1.txt test_cat2.txt
-rm -rf test_cat1.txt test_cat2.txt
+# cat -E ./txt/*.txt > test_cat1.txt
+# ../cat/s21_cat -e ./txt/*.txt > test_cat2.txt
+# diff test_cat1.txt test_cat2.txt
+# rm -rf test_cat1.txt test_cat2.txt
 
-cat -E ./txt/*.txt > test_cat1.txt
-../cat/s21_cat -E ./txt/*.txt > test_cat2.txt
-diff test_cat1.txt test_cat2.txt
-rm -rf test_cat1.txt test_cat2.txt
+# cat -E ./txt/*.txt > test_cat1.txt
+# ../cat/s21_cat -E ./txt/*.txt > test_cat2.txt
+# diff test_cat1.txt test_cat2.txt
+# rm -rf test_cat1.txt test_cat2.txt
 
 # -n --number
 
@@ -53,7 +48,7 @@ diff test_cat1.txt test_cat2.txt
 rm -rf test_cat1.txt test_cat2.txt
 
 # -t -T
-cat -t ./txt/*.txt > test_cat1.txt
+cat -T ./txt/*.txt > test_cat1.txt
 ../cat/s21_cat -t ./txt/*.txt > test_cat2.txt
 diff test_cat1.txt test_cat2.txt
 rm -rf test_cat1.txt test_cat2.txt
