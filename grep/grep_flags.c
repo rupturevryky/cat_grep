@@ -35,8 +35,8 @@ void flag_n(int line, MyObject *obj, char prev_char, int i,
             printf("%d:", line);
     }
 }
-void print_now_file(const char *file_name, char prev_char, int i, MyObject *obj) {
-    if (obj->h == 0 && file_name != NULL && (prev_char == '\n' || i == 0)) {
+void print_now_file(const char *file_name, char prev_char, int i, MyObject *obj, int is_other_files) {
+    if (obj->h == 0 && file_name != NULL && (prev_char == '\n' || i == 0) && is_other_files) {
         if (isatty(fileno(stdout)))
             printf("\033[0;35m%s\033[0m\033[0;36m:\033[0m", file_name);
         else
@@ -44,18 +44,19 @@ void print_now_file(const char *file_name, char prev_char, int i, MyObject *obj)
     }
 }
 
-void flag_o(int line, MyObject *obj, char prev_char, int i, int updateble, const char *file_name) {
+void flag_o(int line, MyObject *obj, char prev_char, int i, int updateble, const char *file_name,
+            int is_other_files) {
     if (obj->o == 1 && updateble) {
         printf("\n");
-        print_now_file(file_name, prev_char, i, obj);
+        print_now_file(file_name, prev_char, i, obj, is_other_files);
         flag_n(line, obj, prev_char, i, 1);
     }
 }
 
-int flag_c(MyObject *obj, int *line_c, int end, const char *file_name) {
+int flag_c(MyObject *obj, int *line_c, int end, const char *file_name, int is_other_files) {
     if (obj->c == 1) {
         if (end) {  // скипать больше некуда
-            print_now_file(file_name, '\n', 0, obj);
+            print_now_file(file_name, '\n', 0, obj, is_other_files);
             printf("%d\n", *line_c);
             return 0;
         }

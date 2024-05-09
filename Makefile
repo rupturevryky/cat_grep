@@ -10,4 +10,4 @@ grep:
 	gcc -Wall -Werror -Wextra ./grep/grep.c -o ./grep/s21_grep
 
 clear:
-	rm -rf ./grep/s21_grep ./cat/s21_cat
+	rm -rf ./grep/s21_grep ./cat/s21_cat ./common/*txt

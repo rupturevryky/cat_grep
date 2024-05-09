@@ -48,12 +48,14 @@ int main(int argc, char *argv[]) {
         regcomp(&regex, pattern, REG_EXTENDED);
 
     if ((optind + 1 == argc && obj.f == 0) || (optind == argc && obj.f == 1)) {
-        infinity_input(&regex, &obj, 8192, NULL, NULL);
+        infinity_input(&regex, &obj, 8192, NULL, NULL, 0);
         regfree(&regex);
         // if (pattern) free(pattern);
         return 0;
     }
     optind++;
+    int is_other_files = 0;
+    if (optind + 1 < argc) is_other_files = 1;
 
     FILE *now_file = NULL;
     for (int i = optind; i < argc; i++) {
@@ -67,9 +69,10 @@ int main(int argc, char *argv[]) {
         // Определение размера файла
         fseek(now_file, 0, SEEK_END);
         long fileSize = ftell(now_file);
+        fileSize++;
         fseek(now_file, 0, SEEK_SET);
 
-        infinity_input(&regex, &obj, fileSize, now_file, filename);
+        infinity_input(&regex, &obj, fileSize, now_file, filename, is_other_files);
 
         if (now_file) fclose(now_file);
     }
