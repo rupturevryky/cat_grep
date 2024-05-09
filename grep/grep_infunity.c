@@ -7,9 +7,9 @@ void take_correct_edges(char *input, int *pattern_end, int *pattern_index) {
     int i = *pattern_index;
 
     for (i = i; i <= end; i++) {
-        if (!isascii(input[i])) {
+        if (!isascii(input[i]))
             count_ru += 0.5;
-        } else
+        else
             count_else++;
     }
 
@@ -61,9 +61,8 @@ void next_found(char *input, regex_t *regex, int *pattern_index, int *reti, int 
 void print_char_in_infinuty(int *pattern_index, int *pattern_end, int *updateble, char *input, int *reti,
                             regex_t *regex, int i, MyObject *obj, int line, regmatch_t match,
                             int *now_pattern_start, int *now_pattern_end, const char *file_name) {
-    if (*updateble && i > *pattern_index && i > *now_pattern_end) {
+    if (*updateble && i > *pattern_index && i > *now_pattern_end)
         next_found(input, regex, pattern_index, reti, pattern_end, updateble, match, i);
-    }
 
     if (i > *now_pattern_end) {
         *now_pattern_start = *pattern_index;
@@ -125,15 +124,13 @@ void infinity_input(regex_t *regex, MyObject *obj, const int sizeof_string, FILE
     int line_c = 0;
     char input[sizeof_string];
 
-    if (now_file != NULL) {
-        while (fgets(input, sizeof(input), now_file) != NULL) {
+    if (now_file != NULL)
+        while (fgets(input, sizeof(input), now_file) != NULL)
             while_decompose(&line, input, regex, obj, file_name, &line_c);
-        }
-    } else {
-        while (fgets(input, sizeof(input), stdin) != NULL) {
+
+    else
+        while (fgets(input, sizeof(input), stdin) != NULL)
             while_decompose(&line, input, regex, obj, file_name, &line_c);
-        }
-    }
 
     flag_c(obj, &line_c, 1, file_name);
 }
