@@ -14,15 +14,15 @@ rm -rf test_cat1.txt test_cat2.txt
 
 # -e -E
 
-# cat -E ./txt/*.txt > test_cat1.txt
-# ../cat/s21_cat -e ./txt/*.txt > test_cat2.txt
-# diff test_cat1.txt test_cat2.txt
-# rm -rf test_cat1.txt test_cat2.txt
+cat -E ./txt/*.txt > test_cat1.txt
+../cat/s21_cat -e ./txt/*.txt > test_cat2.txt
+diff test_cat1.txt test_cat2.txt
+rm -rf test_cat1.txt test_cat2.txt
 
-# cat -E ./txt/*.txt > test_cat1.txt
-# ../cat/s21_cat -E ./txt/*.txt > test_cat2.txt
-# diff test_cat1.txt test_cat2.txt
-# rm -rf test_cat1.txt test_cat2.txt
+cat -E ./txt/*.txt > test_cat1.txt
+../cat/s21_cat -E ./txt/*.txt > test_cat2.txt
+diff test_cat1.txt test_cat2.txt
+rm -rf test_cat1.txt test_cat2.txt
 
 # -n --number
 
