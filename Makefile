@@ -9,5 +9,5 @@ cat:
 grep:
 	gcc -Wall -Werror -Wextra ./grep/grep.c -o ./grep/s21_grep
 
-clear:
-	rm -rf ./grep/s21_grep ./cat/s21_cat ./common/*txt
+clean:
+	rm -rf ./grep/s21_grep ./cat/s21_cat ./common/test_grep2.txt ./common/test_grep1.txt ./common/patern.txt ./common/test_cat1.txt ./common/test_cat2.txt
