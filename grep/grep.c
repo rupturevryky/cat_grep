@@ -41,8 +41,6 @@ int main(int argc, char *argv[]) {
 
     if (obj.f == 0) pattern = argv[optind];
 
-    // flag_i(&obj, pattern);
-
     regex_t regex;
     if (obj.i == 1)
         regcomp(&regex, pattern, REG_ICASE);
@@ -50,7 +48,7 @@ int main(int argc, char *argv[]) {
         regcomp(&regex, pattern, REG_EXTENDED);
 
     if ((optind + 1 == argc && obj.f == 0) || (optind == argc && obj.f == 1)) {
-        infinity_input(&regex, &obj);
+        infinity_input(&regex, &obj, 8192, NULL, NULL);
         regfree(&regex);
         // if (pattern) free(pattern);
         return 0;
@@ -62,24 +60,17 @@ int main(int argc, char *argv[]) {
         char *filename = argv[i];
         now_file = fopen(filename, "r");
 
-        if (now_file == NULL) {
-            printf("grep: %s: No such file or directory", filename);
+        if (!now_file) {
+            if (!obj.s) printf("grep: %s: No such file or directory", filename);
             continue;
         };
         // Определение размера файла
         fseek(now_file, 0, SEEK_END);
         long fileSize = ftell(now_file);
         fseek(now_file, 0, SEEK_SET);
-        // Создаём массим buffer и копируем в него текущий файл
-        char *buffer = (char *)malloc(fileSize);
-        if (buffer == NULL) {
-            fclose(now_file);
-            continue;
-        }
-        fread(buffer, fileSize, 1, now_file);
-        buffer[fileSize] = '\0';
 
-        free(buffer);
+        infinity_input(&regex, &obj, fileSize, now_file, filename);
+
         if (now_file) fclose(now_file);
     }
 

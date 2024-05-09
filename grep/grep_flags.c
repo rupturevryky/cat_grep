@@ -35,21 +35,31 @@ void flag_n(int line, MyObject *obj, char prev_char, int i,
             printf("%d:", line);
     }
 }
+void print_now_file(const char *file_name, char prev_char, int i, MyObject *obj) {
+    if (obj->h == 0 && file_name != NULL && (prev_char == '\n' || i == 0)) {
+        if (isatty(fileno(stdout)))
+            printf("\033[0;35m%s\033[0m\033[0;36m:\033[0m", file_name);
+        else
+            printf("%s:", file_name);
+    }
+}
 
-void flag_o(int line, MyObject *obj, char prev_char, int i, int updateble) {
+void flag_o(int line, MyObject *obj, char prev_char, int i, int updateble, const char *file_name) {
     if (obj->o == 1 && updateble) {
         printf("\n");
+        print_now_file(file_name, prev_char, i, obj);
         flag_n(line, obj, prev_char, i, 1);
     }
 }
 
-int flag_c(MyObject *obj, int *line_c, int end) {
+int flag_c(MyObject *obj, int *line_c, int end, const char *file_name) {
     if (obj->c == 1) {
         if (end) {  // скипать больше некуда
-            printf("%d", *line_c);
+            print_now_file(file_name, '\n', 0, obj);
+            printf("%d\n", *line_c);
             return 0;
         }
-        // obj->c == 1 - скипаем дальше считаем линии
+        // скипаем дальше считаем линии
         *line_c += 1;
         return 0;
     }
