@@ -1,7 +1,7 @@
-void end_and_start_string(MyObject *obj, const char last_char, int n_place,
+void end_and_start_string(MyObject *obj, const char prev_char, int n_place,
                           int *checher_start, int *need_dollar, int *need_r) {
   if (*need_dollar) {
-    if (obj->e == 1 && last_char != '\t') printf("^M");
+    if (obj->e == 1 && prev_char != '\t') printf("^M");
     if (obj->e == 1) printf("$");
     if (*need_r && obj->e != 1) printf("\r");
     *need_r = 0;
@@ -35,7 +35,11 @@ void print_line(MyObject *obj, const char *input, int n_place,
 
     i++;
   }
-  *prev_char = input[i - 1];
+  if (i > 0)
+    *prev_char = input[i - 1];
+  else
+    *prev_char = input[i];
+
   if (input[i] != '\0') *need_r = 1;
   end_and_start_string(obj, *prev_char, n_place, checher_start, need_dollar,
                        need_r);
@@ -61,9 +65,10 @@ void printer(MyObject *obj, int *line, const int sizeof_string, FILE *now_file,
     if (((obj->b == 1 && input[0] != '\0' && input[0] != '\n') ||
          obj->n == 1) &&
         (!start_file || *checher_start)) {
-      if (*need_r) printf("\r");
-      *need_r = 0;
-
+      if (*need_r) {
+        printf("\r");
+        *need_r = 0;
+      }
       printf("%6d\t", *line);
     }
 

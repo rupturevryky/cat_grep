@@ -1,23 +1,17 @@
 #ifndef GREPFLAGS
 #define GREPFLAGS
 
-int flag_f(MyObject *obj, FILE *reg_ex_file, char *pattern) {
+int flag_f(MyObject *obj, char **pattern) {
   obj->f = 1;
-  reg_ex_file = fopen(optarg, "r");
+
+  FILE *reg_ex_file = fopen(optarg, "r");
 
   if (reg_ex_file != NULL) {
-    long file_size;
-    // Определяем размер файла
-    fseek(reg_ex_file, 0, SEEK_END);
-    file_size = ftell(reg_ex_file);
-    fseek(reg_ex_file, 0, SEEK_SET);
-
-    // Выделяем память для буфера
-    pattern = (char *)realloc(pattern, file_size);
-
+    size_t len = 0;
     // Читаем содержимое файла в буфер
-    fread(pattern, sizeof(char), file_size, reg_ex_file);
-    pattern[file_size - 1] = '\0';
+    getline(pattern, &len, reg_ex_file);
+    if ((*pattern)[strlen(*pattern) - 1] == '\n')
+      (*pattern)[strlen(*pattern) - 1] = '\0';
 
     // Закрываем файл
     fclose(reg_ex_file);
@@ -41,8 +35,8 @@ void flag_n(
 }
 void print_now_file(const char *file_name, char prev_char, int i, MyObject *obj,
                     int is_other_files, int should_word) {
-  if (obj->h == 0 && file_name != NULL &&
-      (prev_char == '\n' || i == 0 || should_word) && is_other_files) {
+  if (obj->h == 0 && is_other_files && file_name &&
+      (prev_char == '\n' || i == 0 || should_word)) {
     if (isatty(fileno(stdout)))
       printf("\033[0;35m%s\033[0m\033[0;36m:\033[0m", file_name);
     else
@@ -83,7 +77,7 @@ int flag_l(MyObject *obj, const char *file_name) {
         printf("(standard input)");
     } else {
       if (isatty(fileno(stdout)))
-        printf("\033[38;5;129m%s\033[0m", file_name);
+        printf("\033[0;35m%s\033[0m", file_name);
       else
         printf("%s", file_name);
       printf("\n");

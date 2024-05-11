@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
   int checher_start = 1;
   int need_dollar = 0;
   int need_r = 0;
-  char prev_char;
+  char prev_char = '\n';
   int squeeze_blank = 0;
 
   FILE *now_file = NULL;
