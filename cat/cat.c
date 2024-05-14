@@ -9,6 +9,7 @@ typedef struct {
   int n;
   int s;
   int t;
+  int v;
 } MyObject;
 
 #include "infinity_cat_input.c"
@@ -17,7 +18,7 @@ typedef struct {
 void check_opt(MyObject *obj, int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
-  MyObject obj = {0, 0, 0, 0, 0};
+  MyObject obj = {0, 0, 0, 0, 0, 0};
 
   // Проверяем, что переданы аргументы командной строки
   if (argc < 2) infinity_input(&obj);
@@ -41,7 +42,8 @@ int main(int argc, char *argv[]) {
     now_file = fopen(filename, "r");
     // Проверяем, удалось ли открыть файл
     if (!now_file) {
-      printf("cat: %s: No such file or directory\n", filename);
+      fprintf(stderr, "cat: %s: No such file or directory\n", filename);
+      fflush(stderr);
       continue;
     }
     // Определение размера файла
@@ -67,7 +69,7 @@ void check_opt(MyObject *obj, int argc, char *argv[]) {
   };
 
   int option;
-  while ((option = getopt_long(argc, argv, "benstET", options, NULL)) != EOF) {
+  while ((option = getopt_long(argc, argv, "benstvET", options, NULL)) != EOF) {
     switch (option) {
       case 'b':
         obj->b = 1;
@@ -78,6 +80,7 @@ void check_opt(MyObject *obj, int argc, char *argv[]) {
         break;
       case 'e':
         obj->e = 1;
+        obj->v = 1;
         break;
       case 'E':
         obj->e = 1;
@@ -87,9 +90,13 @@ void check_opt(MyObject *obj, int argc, char *argv[]) {
         break;
       case 't':
         obj->t = 1;
+        obj->v = 1;
         break;
       case 'T':
         obj->t = 1;
+        break;
+      case 'v':
+        obj->v = 1;
         break;
       case '?':
         exit(1);

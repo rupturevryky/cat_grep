@@ -1,14 +1,14 @@
-void end_and_start_string(MyObject *obj, const char prev_char, int n_place,
-                          int *checher_start, int *need_dollar, int *need_r) {
+void end_and_start_string(MyObject *obj, int n_placed, int *checher_start,
+                          int *need_dollar, int *need_r) {
   if (*need_dollar) {
-    if (obj->e == 1 && prev_char != '\t') printf("^M");
+    if (obj->v == 1 && *need_r) printf("^M");
     if (obj->e == 1) printf("$");
-    if (*need_r && obj->e != 1) printf("\r");
+    if (*need_r && obj->v == 0) printf("\r");
     *need_r = 0;
     printf("\n");
     *need_dollar = 0;
   } else {
-    if (n_place == 1) {
+    if (n_placed == 1) {
       *checher_start = 1;
       *need_dollar = 1;
     } else {
@@ -18,20 +18,21 @@ void end_and_start_string(MyObject *obj, const char prev_char, int n_place,
   }
 }
 
-void print_line(MyObject *obj, const char *input, int n_place,
+void print_line(MyObject *obj, const char *input, int n_placed,
                 int *checher_start, int *need_dollar, char *prev_char,
                 int *need_r) {
   int i = 0;
   *checher_start = 0;
 
-  end_and_start_string(obj, *prev_char, n_place, checher_start, need_dollar,
-                       need_r);
+  end_and_start_string(obj, n_placed, checher_start, need_dollar, need_r);
 
   while (input[i] != '\0' && input[i] != '\r') {
     if (obj->t == 1 && input[i] == '\t') {
       printf("^I");
-    } else
+    } else if (obj->v == 0)
       printf("%c", input[i]);
+    else
+      flag_v(input[i]);
 
     i++;
   }
@@ -41,8 +42,7 @@ void print_line(MyObject *obj, const char *input, int n_place,
     *prev_char = input[i];
 
   if (input[i] != '\0') *need_r = 1;
-  end_and_start_string(obj, *prev_char, n_place, checher_start, need_dollar,
-                       need_r);
+  end_and_start_string(obj, n_placed, checher_start, need_dollar, need_r);
 }
 void printer(MyObject *obj, int *line, const int sizeof_string, FILE *now_file,
              int *checher_start, int *need_dollar, char *prev_char,
@@ -55,10 +55,11 @@ void printer(MyObject *obj, int *line, const int sizeof_string, FILE *now_file,
     else
       *squeeze_blank = 0;
     if (obj->s == 1 && *squeeze_blank > 1) continue;
-    if (*checher_start) *line += 1;
+    if (*checher_start && ((obj->b == 1 && *squeeze_blank == 0) || obj->n == 1))
+      *line += 1;
 
-    int n_place = 0;
-    if (strchr(input, '\n')) n_place = 1;
+    int n_placed = 0;
+    if (strchr(input, '\n')) n_placed = 1;
 
     input[strcspn(input, "\n")] = '\0';  // Удаляем символ новой строки
 
@@ -72,7 +73,7 @@ void printer(MyObject *obj, int *line, const int sizeof_string, FILE *now_file,
       printf("%6d\t", *line);
     }
 
-    print_line(obj, input, n_place, checher_start, need_dollar, prev_char,
+    print_line(obj, input, n_placed, checher_start, need_dollar, prev_char,
                need_r);
   }
 }

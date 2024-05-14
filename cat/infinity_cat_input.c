@@ -9,14 +9,25 @@ int is_string_empty(int i, char *buffer) {
   return 0;
 }
 
-void print_char_inf(char *input, int t) {
+void flag_v(char ch) {
+  if (0 < ch && ch <= 31 && ch != '\t' && ch != '\n')
+    printf("^%c", ch + 64);
+  else if (ch == 127) {
+    printf("^?");
+  } else
+    printf("%c", ch);
+}
+
+void print_char_inf(char *input, MyObject *obj) {
   if (strcmp(input, "\n") != 0) {
-    for (int i = 0; input[i] != '\n'; i++) {
+    for (int i = 0; input[i] != '\n' && input[i] != '\0'; i++) {
       // флаг -t
-      if (t == 1 && input[i] == '\t')
+      if (obj->t == 1 && input[i] == '\t')
         printf("^I");
-      else
+      else if (obj->v == 0)
         printf("%c", input[i]);
+      else
+        flag_v(input[i]);
     }
   }
 }
@@ -39,7 +50,7 @@ void infinity_input(MyObject *obj) {
     };
     if (obj->b == 1) flag_b(empty_string_checker, &line);
 
-    print_char_inf(input, obj->t);
+    print_char_inf(input, obj);
 
     if (obj->e == 1) printf("$");
     printf("\n");
