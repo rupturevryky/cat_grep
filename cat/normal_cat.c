@@ -1,9 +1,9 @@
 void end_and_start_string(MyObject *obj, int n_placed, int *checher_start,
                           int *need_dollar, int *need_r) {
   if (*need_dollar) {
-    if (obj->v == 1 && *need_r) printf("^M");
+    if ((obj->v == 1 || obj->e == 1) && *need_r) printf("^M");
     if (obj->e == 1) printf("$");
-    if (*need_r && obj->v == 0) printf("\r");
+    if (*need_r && obj->v == 0 && obj->e == 0) printf("\r");
     *need_r = 0;
     printf("\n");
     *need_dollar = 0;
