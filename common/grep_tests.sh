@@ -2,55 +2,60 @@
 
 SUCCESS=0
 FAIL=0
-COUNTER=0
 DIFF_RES=""
+COUNTER=0
+RED="$(tput setaf 1)"
+GREEN="$(tput setaf 2)"
+BASE="$(tput setaf 7)"
 
 declare -a tests=(
-"s test_0_grep.txt VAR"
-"for s21_grep.c grep.h Makefile VAR"
-"for s21_grep.c VAR"
-"-e for -e ^int s21_grep.c grep.h Makefile VAR"
-"-e for -e ^int s21_grep.c VAR"
-"-e while -e void s21_grep.c Makefile VAR -f test_ptrn_grep.txt"
+    "s ./txt/grep1.txt VAR"
+    "for ../grep/grep.c ../grep/Makefile VAR"
+    "for ../grep/grep.c VAR"
+    "-e ^int ../grep/grep.c ../grep/grep.h ../grep/Makefile VAR"
+    "-e for ../grep/grep.c VAR"
+    "-e while ../grep/grep.c ../grep/Makefile VAR -f ./txt/pattern_grep.txt"
 )
 
 declare -a extra=(
-"-n for test_1_grep.txt test_2_grep.txt"
-"-n for test_1_grep.txt"
-"-n -e ^\} test_1_grep.txt"
-"-c -e \/ test_1_grep.txt"
-"-ce ^int test_1_grep.txt test_2_grep.txt"
-"-e ^int test_1_grep.txt"
-"-nivh = test_1_grep.txt test_2_grep.txt"
-"-e"
-"-ie INT test_5_grep.txt"
-"-echar test_1_grep.txt test_2_grep.txt"
-"-ne = -e out test_5_grep.txt"
-"-iv int test_5_grep.txt"
-"-in int test_5_grep.txt"
-"-c -l aboba test_1_grep.txt test_5_grep.txt"
-"-v test_1_grep.txt -e ank"
-"-noe ) test_5_grep.txt"
-"-l for test_1_grep.txt test_2_grep.txt"
-"-e = -e out test_5_grep.txt"
-"-e ing -e as -e the -e not -e is test_6_grep.txt"
-"-l for no_file.txt test_2_grep.txt"
+    "-n for ../grep/grep.c ../cat/cat.c"
+    "-n for ../grep/grep.c"
+    "-n -e ^\} ../grep/grep.c"
+    "-c -e \/ ../grep/grep.c"
+    "-ce ^int ../grep/grep.c ../cat/cat.c"
+    "-e ^int ../grep/grep.c"
+    "-nivh = ../grep/grep.c ../cat/cat.c"
+    "-e"
+    "-ie INT ../cat/infinity_cat_input.c"
+    "-echar ../grep/grep.c ../cat/cat.c"
+    "-ne = ../cat/infinity_cat_input.c"
+    "-iv int ../cat/infinity_cat_input.c"
+    "-in int ../cat/infinity_cat_input.c"
+    "-c -l aboba ../grep/grep.c ../cat/infinity_cat_input.c"
+    "-v ../grep/grep.c -e ank"
+    "-noe ) ../cat/infinity_cat_input.c"
+    "-l for ../grep/grep.c ../cat/cat.c"
+    "-e out ../cat/infinity_cat_input.c"
+    "-e ing ./txt/grep2.txt"
+    "-l for no_file.txt ../cat/cat.c"
 )
 
 testing()
 {
     t=$(echo $@ | sed "s/VAR/$var/")
-    ./s21_grep $t > test_s21_grep.log
+    ../grep/s21_grep $t > test_s21_grep.log
     grep $t > test_sys_grep.log
     DIFF_RES="$(diff -s test_s21_grep.log test_sys_grep.log)"
+    RESULT="SUCCESS"
     (( COUNTER++ ))
     if [ "$DIFF_RES" == "Files test_s21_grep.log and test_sys_grep.log are identical" ]
     then
       (( SUCCESS++ ))
-      echo "\033[31m$FAIL\033[0m/\033[32m$SUCCESS\033[0m/$COUNTER \033[32msuccess\033[0m grep $t"
+      echo "[${GREEN}${SUCCESS}${BASE}/${RED}${FAIL}${BASE}] ${GREEN}${RESULT}${BASE} grep $t"
     else
       (( FAIL++ ))
-      echo "\033[31m$FAIL\033[0m/\033[32m$SUCCESS\033[0m/$COUNTER \033[31mfail\033[0m grep $t"
+      RESULT="FAIL"
+      echo "[${GREEN}${SUCCESS}${BASE}/${RED}${FAIL}${BASE}] ${RED}${RESULT}${BASE} grep $t"
     fi
     rm test_s21_grep.log test_sys_grep.log
 }

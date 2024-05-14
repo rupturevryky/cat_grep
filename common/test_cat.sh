@@ -3,7 +3,7 @@
 SUCCESS=0
 FAIL=0
 DIFF_RES=""
-FLAGS="b e n s t v"
+FLAGS="b e E n s t T v"
 RED="$(tput setaf 1)"
 GREEN="$(tput setaf 2)"
 BASE="$(tput setaf 7)"
@@ -33,15 +33,11 @@ testing() {
     then
       (( SUCCESS++ ))
         RESULT="SUCCESS"
+        echo "[${GREEN}${SUCCESS}${BASE}/${RED}${FAIL}${BASE}] ${GREEN}${RESULT}${BASE} cat $t"
     else
       (( FAIL++ ))
         RESULT="FAIL"
-    fi
-    if [ "$RESULT" == "FAIL" ]
-    then 
-    echo "[${GREEN}${SUCCESS}${BASE}/${RED}${FAIL}${BASE}] ${RED}${RESULT}${BASE} cat $t"
-    else
-    echo "[${GREEN}${SUCCESS}${BASE}/${RED}${FAIL}${BASE}] ${GREEN}${RESULT}${BASE} cat $t"
+        echo "[${GREEN}${SUCCESS}${BASE}/${RED}${FAIL}${BASE}] ${RED}${RESULT}${BASE} cat $t"
     fi
     rm test_s21_cat.log test_sys_cat.log
 }
