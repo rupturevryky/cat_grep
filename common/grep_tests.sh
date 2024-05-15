@@ -9,40 +9,41 @@ GREEN="$(tput setaf 2)"
 BASE="$(tput setaf 7)"
 
 declare -a tests=(
-    "s ./txt/grep1.txt VAR"
     "for ../grep/grep.c ../grep/Makefile VAR"
+    "s ./txt/grep1.txt VAR"
+    "-e for -e ^int ../grep/grep.c ../grep/grep.h ../grep/Makefile VAR"
     "for ../grep/grep.c VAR"
-    "-e ^int ../grep/grep.c ../grep/grep.h ../grep/Makefile VAR"
-    "-e for ../grep/grep.c VAR"
-    "-e while ../grep/grep.c ../grep/Makefile VAR -f ./txt/pattern_grep.txt"
+    "-e while -e void ../grep/grep.c ../grep/Makefile VAR -f ./txt/pattern_grep.txt"
+    "-e for -e ^int ../grep/grep.c VAR"
 )
 
 declare -a extra=(
-    "-n for ../grep/grep.c ../cat/cat.c"
-    "-n for ../grep/grep.c"
     "-n -e ^\} ../grep/grep.c"
-    "-c -e \/ ../grep/grep.c"
-    "-ce ^int ../grep/grep.c ../cat/cat.c"
+    "-n for ../grep/grep.c"
+    "-n for ../grep/grep.c ../cat/cat.c"
     "-e ^int ../grep/grep.c"
-    "-nivh = ../grep/grep.c ../cat/cat.c"
-    "-e"
+    "-ce ^int ../grep/grep.c ../cat/cat.c"
+    "-c -e \/ ../grep/grep.c"
     "-ie INT ../cat/infinity_cat_input.c"
-    "-echar ../grep/grep.c ../cat/cat.c"
-    "-ne = ../cat/infinity_cat_input.c"
+    "-e"
+    "-nivh = ../grep/grep.c ../cat/cat.c"
     "-iv int ../cat/infinity_cat_input.c"
-    "-in int ../cat/infinity_cat_input.c"
-    "-c -l aboba ../grep/grep.c ../cat/infinity_cat_input.c"
+    "-ne = -e out ../cat/infinity_cat_input.c"
+    "-echar ../grep/grep.c ../cat/cat.c"
     "-v ../grep/grep.c -e ank"
-    "-noe ) ../cat/infinity_cat_input.c"
+    "-c -l aboba ../grep/grep.c ../cat/infinity_cat_input.c"
+    "-in int ../cat/infinity_cat_input.c"
+    "-e = -e out ../cat/infinity_cat_input.c"
     "-l for ../grep/grep.c ../cat/cat.c"
-    "-e out ../cat/infinity_cat_input.c"
-    "-e ing ./txt/grep2.txt"
     "-l for no_file.txt ../cat/cat.c"
+    "-noe ) ../cat/infinity_cat_input.c"
+    "-e ing -e as -e the -e not -e is  ./txt/grep2.txt"
 )
 
 testing()
 {
     t=$(echo $@ | sed "s/VAR/$var/")
+    # echo "../grep/s21_grep $t "
     ../grep/s21_grep $t > test_s21_grep.log
     grep $t > test_sys_grep.log
     DIFF_RES="$(diff -s test_s21_grep.log test_sys_grep.log)"
@@ -147,6 +148,6 @@ do
     done
 done
 
-echo "\033[31mFAIL: $FAIL\033[0m"
-echo "\033[32mSUCCESS: $SUCCESS\033[0m"
+echo "${RED}FAIL: ${FAIL}${BASE}"
+echo "${GREEN}SUCCESS: ${SUCCESS}${BASE}"
 echo "ALL: $COUNTER"

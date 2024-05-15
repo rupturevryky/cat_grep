@@ -1,25 +1,49 @@
 #ifndef GREPFLAGS
 #define GREPFLAGS
 
-int flag_f(MyObject *obj, char **pattern) {
+void add_pattern(MyObject *obj, char *pattern_before, char *new_pattern) {
+  if (obj->len_pattern != 0) {
+    strcat(pattern_before + obj->len_pattern, "|");
+    obj->len_pattern += 1;
+  }
+  obj->len_pattern +=
+      sprintf(pattern_before + obj->len_pattern, "(%s)", new_pattern);
+
+  // printf("'%s'\n", pattern_before);
+}
+
+int flag_f(MyObject *obj, char *pattern) {
   obj->f = 1;
 
   FILE *reg_ex_file = fopen(optarg, "r");
 
   if (reg_ex_file != NULL) {
     size_t len = 0;
+    char *now_pattern = NULL;
     // Читаем содержимое файла в буфер
-    getline(pattern, &len, reg_ex_file);
-    if ((*pattern)[strlen(*pattern) - 1] == '\n')
-      (*pattern)[strlen(*pattern) - 1] = '\0';
+    int res_get_line = getline(&now_pattern, &len, reg_ex_file);
 
-    // Закрываем файл
+    while (res_get_line != -1) {
+      if (now_pattern[res_get_line - 1] == '\n')
+        now_pattern[res_get_line - 1] = '\0';
+      add_pattern(obj, pattern, now_pattern);
+      res_get_line = getline(&now_pattern, &len, reg_ex_file);
+    }
+    free(now_pattern);
+
+    // if ((*pattern)[strlen(*pattern) - 1] == '\n')
+    //   (*pattern)[strlen(*pattern) - 1] = '\0';
+
+    // // Закрываем файл
     fclose(reg_ex_file);
     if (pattern == NULL) return 1;
 
     return 0;
   }
-  printf("grep: %s: No such file or directory", optarg);
+  if (!obj->s) {
+    fprintf(stderr, "grep: %s: No such file or directory\n", optarg);
+    fflush(stderr);
+  }
   return 1;
 };
 
@@ -56,7 +80,7 @@ void flag_o(int line, MyObject *obj, char prev_char, int i, int updateble,
 int flag_c(MyObject *obj, int *line_c, int end, const char *file_name,
            int is_other_files) {
   if (obj->c == 1) {
-    if (end) {  // скипать больше некуда
+    if (end && (obj->l == 0 || *line_c > 0)) {  // скипать больше некуда
       print_now_file(file_name, '\n', 0, obj, is_other_files, 0);
       printf("%d\n", *line_c);
       return 0;

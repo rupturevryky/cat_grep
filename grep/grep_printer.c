@@ -97,9 +97,12 @@ int check_line_for_pattern(char *input, regex_t *regex, int line, MyObject *obj,
   flag_v(obj, &reti);
 
   if (!reti) {
+    // printf("reti: %d\n", reti);
+
     if (flag_l(obj, file_name) == 0) return 1;
 
     if (flag_c(obj, line_c, 0, file_name, is_other_files) == 0) return 0;
+    if (obj->v == 1 && obj->o == 1) return 0;
     if (obj->v == 1) {
       print_now_file(file_name, '\0', 0, obj, is_other_files, 1);
       flag_n(line, obj, '\0', 0, 1);

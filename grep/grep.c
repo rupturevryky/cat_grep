@@ -16,62 +16,76 @@ typedef struct {
   int s;
   int f;
   int o;
+  int len_pattern;
 } MyObject;
 
 #include "grep_flags.c"
 #include "grep_printer.c"
 
-int check_opt(MyObject *obj, int argc, char *argv[], char **pattern);
+int check_opt(MyObject *obj, int argc, char *argv[], char *pattern);
 
 int main(int argc, char *argv[]) {
-  MyObject obj = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  char *pattern = NULL;
+  MyObject obj = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  char pattern[15000];
 
-  if (check_opt(&obj, argc, argv, &pattern) != 0) {
+  if (check_opt(&obj, argc, argv, pattern) != 0) {
     return 1;
   };
+  // printf("'%s'\n", pattern);
   // Проверяем, что передан патерн
   if (optind == argc && obj.f == 0) {
-    printf("Usage: grep [OPTION]... PATTERNS [FILE]...");
+    fprintf(stderr, "Usage: grep [OPTION]... PATTERNS [FILE]...");
     return 1;
   }
 
-  if (obj.f == 0 && obj.e == 0) pattern = argv[optind];
+  if (obj.len_pattern == 0) {
+    add_pattern(&obj, pattern, argv[optind]);
+    optind++;
+  }
+  // pattern = argv[optind];
+  // getline(&now_pattern, &len, reg_ex_file);
 
   regex_t regex;
   int compare_flgs = 1;
   if (obj.i == 1)
-    compare_flgs = regcomp(&regex, pattern, REG_ICASE);
+    compare_flgs = regcomp(&regex, pattern, REG_EXTENDED | REG_ICASE);
   else
     compare_flgs = regcomp(&regex, pattern, REG_EXTENDED);
 
   if (compare_flgs == 1) {
-    if (obj.f == 1) free(pattern);
+    // if (obj.f == 1) free(pattern);
     return 1;
   }
-  if (obj.f == 1) free(pattern);
+  // if (obj.f == 1) free(pattern);
 
   int is_other_files = 0;
 
-  if ((optind + 1 == argc && obj.f == 0) || (optind == argc && obj.f == 1)) {
+  if ((optind + 1 > argc && obj.f == 0 && obj.e == 0) ||
+      (optind >= argc && (obj.f == 1 || obj.e == 1))) {
     FILE *now_file = NULL;
     char *filename = NULL;
     const int sizeof_string = 16384;
+    // printf("'%s'\n", pattern);
     grep_printer(&regex, &obj, sizeof_string, now_file, filename,
                  is_other_files);
     regfree(&regex);
     return 0;
   }
-  optind++;
   if (optind + 1 < argc) is_other_files = 1;
 
   FILE *now_file = NULL;
+  // printf("'%s'\n", pattern);
   for (int i = optind; i < argc; i++) {
+    // printf("'%s'\n", pattern);
+
     char *filename = argv[i];
     now_file = fopen(filename, "r");
 
     if (!now_file) {
-      if (!obj.s) printf("grep: %s: No such file or directory", filename);
+      if (!obj.s) {
+        fprintf(stderr, "grep: %s: No such file or directory\n", filename);
+        fflush(stderr);
+      }
       continue;
     };
     // Определение размера файла
@@ -89,13 +103,15 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-int check_opt(MyObject *obj, int argc, char *argv[], char **pattern) {
+int check_opt(MyObject *obj, int argc, char *argv[], char *pattern) {
   int option;
   while ((option = getopt(argc, argv, "e:ivclnhsof:")) != -1) {
     switch (option) {
       case 'e':
         obj->e = 1;
-        *pattern = optarg;
+        add_pattern(obj, pattern, optarg);
+        // *pattern = optarg;
+        // printf("'%s'\n", pattern);
         break;
       case 'i':
         obj->i = 1;
