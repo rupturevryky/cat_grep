@@ -8,8 +8,6 @@ void add_pattern(MyObject *obj, char *pattern_before, char *new_pattern) {
   }
   obj->len_pattern +=
       sprintf(pattern_before + obj->len_pattern, "(%s)", new_pattern);
-
-  // printf("'%s'\n", pattern_before);
 }
 
 int flag_f(MyObject *obj, char *pattern) {
@@ -30,9 +28,6 @@ int flag_f(MyObject *obj, char *pattern) {
       res_get_line = getline(&now_pattern, &len, reg_ex_file);
     }
     free(now_pattern);
-
-    // if ((*pattern)[strlen(*pattern) - 1] == '\n')
-    //   (*pattern)[strlen(*pattern) - 1] = '\0';
 
     // // Закрываем файл
     fclose(reg_ex_file);

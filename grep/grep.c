@@ -31,7 +31,6 @@ int main(int argc, char *argv[]) {
   if (check_opt(&obj, argc, argv, pattern) != 0) {
     return 1;
   };
-  // printf("'%s'\n", pattern);
   // Проверяем, что передан патерн
   if (optind == argc && obj.f == 0) {
     fprintf(stderr, "Usage: grep [OPTION]... PATTERNS [FILE]...");
@@ -42,8 +41,6 @@ int main(int argc, char *argv[]) {
     add_pattern(&obj, pattern, argv[optind]);
     optind++;
   }
-  // pattern = argv[optind];
-  // getline(&now_pattern, &len, reg_ex_file);
 
   regex_t regex;
   int compare_flgs = 1;
@@ -53,10 +50,8 @@ int main(int argc, char *argv[]) {
     compare_flgs = regcomp(&regex, pattern, REG_EXTENDED);
 
   if (compare_flgs == 1) {
-    // if (obj.f == 1) free(pattern);
     return 1;
   }
-  // if (obj.f == 1) free(pattern);
 
   int is_other_files = 0;
 
@@ -65,7 +60,6 @@ int main(int argc, char *argv[]) {
     FILE *now_file = NULL;
     char *filename = NULL;
     const int sizeof_string = 16384;
-    // printf("'%s'\n", pattern);
     grep_printer(&regex, &obj, sizeof_string, now_file, filename,
                  is_other_files);
     regfree(&regex);
